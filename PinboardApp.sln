@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.1.32407.343
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PinboardApp", "PinboardApp\PinboardApp.csproj", "{DE8C8628-32BA-43A4-8A78-5FCC5E62DABC}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DE8C8628-32BA-43A4-8A78-5FCC5E62DABC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DE8C8628-32BA-43A4-8A78-5FCC5E62DABC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DE8C8628-32BA-43A4-8A78-5FCC5E62DABC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DE8C8628-32BA-43A4-8A78-5FCC5E62DABC}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {0DE96677-E1D8-4279-840B-ECD27642A9D9}
+	EndGlobalSection
+EndGlobal

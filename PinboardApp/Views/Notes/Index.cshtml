@@ -1,0 +1,90 @@
+﻿@using Microsoft.AspNet.Identity
+@using Microsoft.AspNet.Identity.Owin
+@using PinboardApp.Models
+@model PinboardApp.Models.Pinboard
+
+@{
+    ViewBag.Title = "Index";
+    ApplicationUser user = System.Web.HttpContext.Current.GetOwinContext().GetUserManager<ApplicationUserManager>().FindById(System.Web.HttpContext.Current.User.Identity.GetUserId());
+}
+
+<div style="
+            display: flex; flex-direction: row;
+        ">
+    <div>
+        @if (user.Pinboards is null || user.Pinboards.Count == 0)
+        {
+            <p>No pinboards. Start by creating one</p>
+        }
+        else
+        {
+            <ul>
+                @foreach (var item in user.Pinboards)
+                {
+                    <li>
+                        @Ajax.ActionLink(item.Name, "Index", "Notes", new { id = item.ID }, new AjaxOptions
+                        {
+                            UpdateTargetId = "notes",
+                            InsertionMode = InsertionMode.Replace,
+                            HttpMethod = "GET"
+                        })
+                    </li>
+                }
+            </ul>
+        }
+        
+    </div>
+    <div id="notes">
+        @if (Model is null)
+        {
+            <h3>No Pinboard selected</h3>
+        }
+        else
+        {
+            <h2>Notes in Pinboard @Model.Name </h2>
+
+            <p>
+                @Html.ActionLink("Create New", "Create")
+            </p>
+            <table class="table">
+                <tr>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Notes.First().Name)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Notes.First().Data)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Notes.First().Type)
+                    </th>
+                    <th></th>
+                </tr>
+
+                @foreach (var item in Model.Notes)
+                {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Name)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Data)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Type)
+                        </td>
+                        <td>
+                            @Html.ActionLink("Edit", "Edit", new { id = item.ID }) |
+                            @Html.ActionLink("Details", "Details", new { id = item.ID }) |
+                            @Html.ActionLink("Delete", "Delete", new { id = item.ID })
+                        </td>
+                    </tr>
+                }
+
+            </table>
+        }
+        
+    </div>
+
+</div>
+
+
