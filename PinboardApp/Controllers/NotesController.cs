@@ -20,6 +20,7 @@ namespace PinboardApp.Controllers
 
         [Authorize]
         // GET: Notes
+        // lists notes in a pinboard
         public ActionResult Index(int? id)
         {
             //ApplicationUser user = System.Web.HttpContext.Current.GetOwinContext().GetUserManager<ApplicationUserManager>().FindById(System.Web.HttpContext.Current.User.Identity.GetUserId());
@@ -48,9 +49,18 @@ namespace PinboardApp.Controllers
         }
 
         // GET: Notes/Create
-        public ActionResult Create()
+        public ActionResult Create(int? id)
         {
-            return View();
+            if(id == null)
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            //var user = db.Users.Find(User.Identity.GetUserId());
+            //var pinboard = user.Pinboards.FirstOrDefault(p => p.ID == id);
+            CreateViewModel model = new CreateViewModel {Note = new Note(), PinboardID = id};
+            // if (pinboard is null)
+            // {
+            //     return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            // }
+            return View(model);
         }
 
         // POST: Notes/Create
@@ -58,17 +68,23 @@ namespace PinboardApp.Controllers
         // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "ID,Name,Data,Type")] Note note)
+        public ActionResult Create(CreateViewModel model)
         {
             if (ModelState.IsValid)
             {
-                note.Pinboard = ViewBag.CurrentPinboard;
-                db.Notes.Add(note);
+
+                var user = db.Users.Find(User.Identity.GetUserId());
+                var pinboard = user.Pinboards.FirstOrDefault(p => p.ID == model.PinboardID);
+                if (pinboard is null)
+                {
+                    return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+                }
+                model.Note.Pinboard = pinboard;
+                db.Notes.Add(model.Note);
                 db.SaveChanges();
                 return RedirectToAction("Index");
             }
-
-            return View(note);
+            return View(model);
         }
 
         // GET: Notes/Edit/5
