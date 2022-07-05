@@ -8,33 +8,31 @@
     ApplicationUser user = System.Web.HttpContext.Current.GetOwinContext().GetUserManager<ApplicationUserManager>().FindById(HttpContext.Current.User.Identity.GetUserId());
 }
 
-<div style="
-            display: flex; flex-direction: row;
-        ">
-    <div>
+<div class="container-fluid d-flex flex-row" style="height: 100%">
+    <div style="width: 20%">
         @if (user.Pinboards is null || user.Pinboards.Count == 0)
         {
             <p>No pinboards. Start by creating one</p>
         }
         else
         {
-            <ul>
+            <ul class="nav nav-pills flex-column">
                 @foreach (var item in user.Pinboards)
                 {
-                    <li>
+                    <li class="nav-item">
                         @Ajax.ActionLink(item.Name, "Index", "Notes", new { id = item.ID }, new AjaxOptions
                         {
                             UpdateTargetId = "notes",
                             InsertionMode = InsertionMode.Replace,
                             HttpMethod = "GET"
-                        })
+                        }, new { @class = "nav-link" })
                     </li>
                 }
             </ul>
         }
-        
+
     </div>
-    <div id="notes">
+    <div id="notes" style="background: #d2dadd; width: 80%; border-radius: 1rem 0 0 0" class="p-3">
         @if (Model is null)
         {
             <h3>No Pinboard selected</h3>
@@ -43,48 +41,34 @@
         {
             <h2>Notes in Pinboard @Model.Name </h2>
 
-            <p>
-                @Html.ActionLink("Create New", "Create",new {id = Model.ID})
-            </p>
-            <table class="table">
-                <tr>
-                    <th>
-                        @Html.DisplayNameFor(model => model.Notes.First().Name)
-                    </th>
-                    <th>
-                        @Html.DisplayNameFor(model => model.Notes.First().Data)
-                    </th>
-                    <th>
-                        @Html.DisplayNameFor(model => model.Notes.First().Type)
-                    </th>
-                    <th></th>
-                </tr>
 
-                @foreach (var item in Model.Notes)
-                {
-                    <tr>
-                        <td>
-                            @Html.DisplayFor(modelItem => item.Name)
-                        </td>
-                        <td>
-                            @Html.DisplayFor(modelItem => item.Data)
-                        </td>
-                        <td>
-                            @Html.DisplayFor(modelItem => item.Type)
-                        </td>
-                        <td>
-                            @Html.ActionLink("Edit", "Edit", new { id = item.ID }) |
-                            @Html.ActionLink("Details", "Details", new { id = item.ID }) |
-                            @Html.ActionLink("Delete", "Delete", new { id = item.ID })
-                        </td>
-                    </tr>
-                }
+            @* @Html.ActionLink("Create New", "Create", new { id = Model.ID }) *@
+            <button class ="btn position-fixed end-0 bottom-0 m-5 p-2" id="new-note" style="color: #FFF5F0; background: #a17c6b"><i class="bi bi-plus-circle"></i> New Note</button>
 
-            </table>
+            foreach (var note in Model.Notes)
+            {
+                <div class="card" style="width: 18rem;">
+                    <div class="card-body">
+                        <h5 class="card-title">@note.Name</h5>
+                        <p class="card-text">@note.Data</p>
+                        <a>
+                            <i class="bi bi-trash text-danger"></i>
+                        </a>
+                    </div>
+                </div>
+            }
         }
-        
+
     </div>
 
 </div>
-
-
+@section scripts
+{
+    <script>
+        $(function() {
+            $('#new-note').click(function() {
+                window.location.href = '@Url.Action("Create", "Notes", new {id = Model.ID})';
+            });
+        });
+    </script>
+}

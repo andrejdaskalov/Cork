@@ -55,7 +55,7 @@ namespace PinboardApp.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             //var user = db.Users.Find(User.Identity.GetUserId());
             //var pinboard = user.Pinboards.FirstOrDefault(p => p.ID == id);
-            CreateViewModel model = new CreateViewModel {Note = new Note(), PinboardID = id};
+            CreateViewModel model = new CreateViewModel {Note = new Note(), PinboardId = id};
             // if (pinboard is null)
             // {
             //     return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
@@ -74,7 +74,7 @@ namespace PinboardApp.Controllers
             {
 
                 var user = db.Users.Find(User.Identity.GetUserId());
-                var pinboard = user.Pinboards.FirstOrDefault(p => p.ID == model.PinboardID);
+                var pinboard = user.Pinboards.FirstOrDefault(p => p.ID == model.PinboardId);
                 if (pinboard is null)
                 {
                     return new HttpStatusCodeResult(HttpStatusCode.BadRequest);

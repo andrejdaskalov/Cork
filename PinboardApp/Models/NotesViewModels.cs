@@ -8,6 +8,6 @@ namespace PinboardApp.Models
     public class CreateViewModel
     {
         public Note Note { get; set; }
-        public int? PinboardID { get; set; }
+        public int? PinboardId { get; set; }
     }
 }
