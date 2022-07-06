@@ -22,3 +22,11 @@ select,
 textarea {
     max-width: 280px;
 }
+
+.delete-button{
+    visibility: hidden;
+}
+
+.card-body:hover > .delete-button, .nav-item:hover > .delete-button {
+    visibility: visible;
+}

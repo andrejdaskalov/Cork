@@ -9,7 +9,7 @@
 }
 
 <div class="container-fluid d-flex flex-row" style="height: 100%">
-    <div style="width: 20%">
+    <div style="width: 20%" class="d-flex flex-column justify-content-between">
         @if (user.Pinboards is null || user.Pinboards.Count == 0)
         {
             <p>No pinboards. Start by creating one</p>
@@ -19,18 +19,23 @@
             <ul class="nav nav-pills flex-column">
                 @foreach (var item in user.Pinboards)
                 {
-                    <li class="nav-item">
-                        @Ajax.ActionLink(item.Name, "Index", "Notes", new { id = item.ID }, new AjaxOptions
-                        {
-                            UpdateTargetId = "notes",
-                            InsertionMode = InsertionMode.Replace,
-                            HttpMethod = "GET"
-                        }, new { @class = "nav-link" })
-                    </li>
+                <li class="nav-item d-flex flex-row justify-content-between">
+                    @Ajax.ActionLink(item.Name, "Index", "Notes", new { id = item.ID }, new AjaxOptions
+                    {
+                        UpdateTargetId = "notes",
+                        InsertionMode = InsertionMode.Replace,
+                        HttpMethod = "GET"
+                    }, new { @class = "nav-link" })
+
+                    <a href="@Url.Action("Delete","Pinboards",new {id = item.ID})" class="delete-button py-2 px-5">
+                        <i class="bi bi-trash text-danger"></i>
+                    </a>
+                </li>
                 }
             </ul>
         }
-
+        
+    <button class="btn" id="new-pinboard"><i class="bi bi-plus-circle"></i> New Pinboard</button>
     </div>
     <div id="notes" style="background: #d2dadd; width: 80%; border-radius: 1rem 0 0 0" class="p-3">
         @if (Model is null)
@@ -51,7 +56,7 @@
                     <div class="card-body">
                         <h5 class="card-title">@note.Name</h5>
                         <p class="card-text">@note.Data</p>
-                        <a>
+                        <a href="@Url.Action("Delete","Notes",new {id = note.ID})" class="delete-button">
                             <i class="bi bi-trash text-danger"></i>
                         </a>
                     </div>
@@ -68,6 +73,9 @@
         $(function() {
             $('#new-note').click(function() {
                 window.location.href = '@Url.Action("Create", "Notes", new {id = Model.ID})';
+            });
+            $('#new-pinboard').click(function() {
+                window.location.href = '@Url.Action("Create", "Pinboards")'
             });
         });
     </script>
