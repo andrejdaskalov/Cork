@@ -1,6 +1,7 @@
 ﻿@using Microsoft.AspNet.Identity
 @using Microsoft.AspNet.Identity.Owin
 @using PinboardApp.Models
+@using Type = PinboardApp.Models.Type
 @model PinboardApp.Models.Pinboard
 
 @{
@@ -19,23 +20,23 @@
             <ul class="nav nav-pills flex-column">
                 @foreach (var item in user.Pinboards)
                 {
-                <li class="nav-item d-flex flex-row justify-content-between">
-                    @Ajax.ActionLink(item.Name, "Index", "Notes", new { id = item.ID }, new AjaxOptions
-                    {
-                        UpdateTargetId = "notes",
-                        InsertionMode = InsertionMode.Replace,
-                        HttpMethod = "GET"
-                    }, new { @class = "nav-link" })
+                    <li class="nav-item d-flex flex-row justify-content-between">
+                        @Ajax.ActionLink(item.Name, "Index", "Notes", new { id = item.ID }, new AjaxOptions
+                        {
+                            UpdateTargetId = "notes",
+                            InsertionMode = InsertionMode.Replace,
+                            HttpMethod = "GET"
+                        }, new { @class = "nav-link" })
 
-                    <a href="@Url.Action("Delete","Pinboards",new {id = item.ID})" class="delete-button py-2 px-5">
-                        <i class="bi bi-trash text-danger"></i>
-                    </a>
-                </li>
+                        <a href="@Url.Action("Delete", "Pinboards", new { id = item.ID })" class="hidden-button py-2 px-5">
+                            <i class="bi bi-trash text-danger"></i>
+                        </a>
+                    </li>
                 }
             </ul>
         }
-        
-    <button class="btn" id="new-pinboard"><i class="bi bi-plus-circle"></i> New Pinboard</button>
+
+        <button class="btn" id="new-pinboard"><i class="bi bi-plus-circle"></i> New Pinboard</button>
     </div>
     <div id="notes" style="background: #d2dadd; width: 80%; border-radius: 1rem 0 0 0" class="p-3 position-relative">
         @if (Model is null)
@@ -44,21 +45,40 @@
         }
         else
         {
-            <h2>Notes in Pinboard @Model.Name </h2>
+            <h2 style="color:#506364">Notes in Pinboard @Model.Name </h2>
 
 
             @* @Html.ActionLink("Create New", "Create", new { id = Model.ID }) *@
-            <button class ="btn position-fixed end-0 bottom-0 m-5 p-2" id="new-note" style="color: #FFF5F0; background: #a17c6b"><i class="bi bi-plus-circle"></i> New Note</button>
+            <button class="btn position-fixed end-0 bottom-0 m-5 p-2" id="new-note" style="color: #FFF5F0; background: #a17c6b"><i class="bi bi-plus-circle"></i> New Note</button>
 
             foreach (var note in Model.Notes)
             {
-                <div class="card position-absolute draggable-note" id="@note.ID" style="width: 18rem; left: @note.X ; top:@note.Y;">
+                <div class="card position-absolute draggable-note" id="@note.ID" style="width: 18rem; left: @note.X; top: @note.Y;">
+                    @if (note.Type == Type.Image)
+                    {
+                        <img src="@note.Data" class="card-img-top" alt="@note.Name + 'image'">
+                    }
+                    else if (note.Type == Type.Link)
+                    {
+                        <a href="@note.Data">
+                            <svg class="card-img-top" xmlns="http://www.w3.org/2000/svg" height="80" fill="currentColor" class="bi bi-link" viewBox="0 0 16 16">
+                                <path d="M6.354 5.5H4a3 3 0 0 0 0 6h3a3 3 0 0 0 2.83-4H9c-.086 0-.17.01-.25.031A2 2 0 0 1 7 10.5H4a2 2 0 1 1 0-4h1.535c.218-.376.495-.714.82-1z"/>
+                                <path d="M9 5.5a3 3 0 0 0-2.83 4h1.098A2 2 0 0 1 9 6.5h3a2 2 0 1 1 0 4h-1.535a4.02 4.02 0 0 1-.82 1H12a3 3 0 1 0 0-6H9z"/>
+                            </svg>
+                        </a>
+                    }
                     <div class="card-body">
                         <h5 class="card-title">@note.Name</h5>
-                        <p class="card-text">@note.Data</p>
-                        <a href="@Url.Action("Delete","Notes",new {id = note.ID})" class="delete-button">
-                            <i class="bi bi-trash text-danger"></i>
-                        </a>
+                        @if (note.Type == Type.Text)
+                        {
+                            <p class="card-text">@note.Data</p>
+                        }
+                        <div class="d-flex flex-row justify-content-between">
+                            <button onclick="location.href = '@Url.Action("Edit","Notes",new {id = note.ID})'" class ="btn btn-outline-primary hidden-button">Edit Note</button>
+                            <a href="@Url.Action("Delete", "Notes", new { id = note.ID })" class="hidden-button py-2">
+                                <i class="bi bi-trash text-danger"></i>
+                            </a>
+                        </div>
                     </div>
                 </div>
             }
@@ -67,51 +87,42 @@
     </div>
 
 </div>
+
 @section scripts
 {
     <script>
         $(function() {
-            var loop = false;
             $('#new-note').click(function() {
                 window.location.href = '@Url.Action("Create", "Notes", new { id = Model.ID })';
             });
             $('#new-pinboard').click(function() {
-                window.location.href = '@Url.Action("Create", "Pinboards")'
+                window.location.href = '@Url.Action("Create", "Pinboards")';
             });
-//            $('.draggable-note').mousedown(function (e) {
-//                var parent = $('#notes')[0];
-//                var rect = parent.getBoundingClientRect();
-//
-//                this.style.left = (e.pageX - rect.left) + 'px';
-//                this.style.top = (e.pageY - rect.top) + 'px';
-//            });
+
             $('.draggable-note').draggable({
                 containment: 'parent'
             });
-            
 
             $('.draggable-note').mouseup(function() {
                 var obj = {
-//                    "ID": this.id,
                     "X": this.style.left,
                     "Y": this.style.top
                 }
                 console.log(JSON.stringify(obj));
                 $.ajax({
                     type: 'post',
-                    url: '/Notes/UpdatePosition/'+this.id,
-                    dataType:'json',
+                    url: '/Notes/UpdatePosition/' + this.id,
+                    dataType: 'json',
                     contentType: "application/json; charset=utf-8",
-                    data: JSON.stringify(obj ),
+                    data: JSON.stringify(obj),
                     success: function(obj) {
                         console.log("Successfully pushed position" + obj);
                     },
                     failure: function(obj) {
                         console.log("Failed pushing position" + obj);
                     }
-                })
-            })
-
+                });
+            });
         });
     </script>
 }

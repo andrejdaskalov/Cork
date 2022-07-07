@@ -23,10 +23,10 @@ textarea {
     max-width: 280px;
 }
 
-.delete-button{
+.hidden-button{
     visibility: hidden;
 }
 
-.card-body:hover > .delete-button, .nav-item:hover > .delete-button {
+.card-body:hover  .hidden-button, .nav-item:hover  .hidden-button {
     visibility: visible;
 }
