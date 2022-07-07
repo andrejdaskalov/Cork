@@ -15,6 +15,8 @@ namespace PinboardApp.Models
         [Required]
         public string Data { get; set; }
         public Type Type { get; set; }
+        public string X { get; set; }
+        public  string Y { get; set; }
         public virtual Pinboard Pinboard { get; set; }
 
     }

@@ -2,13 +2,17 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Entity;
+using System.Diagnostics.CodeAnalysis;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.UI;
+using Microsoft.Ajax.Utilities;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
+using Newtonsoft.Json;
 using PinboardApp.Models;
 
 namespace PinboardApp.Controllers
@@ -80,6 +84,11 @@ namespace PinboardApp.Controllers
                     return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
                 }
                 model.Note.Pinboard = pinboard;
+
+                //TODO:function to find next available spot to be added
+                model.Note.X = "0px";
+                model.Note.Y = "0px";
+
                 db.Notes.Add(model.Note);
                 db.SaveChanges();
                 return RedirectToAction("Index");
@@ -100,6 +109,24 @@ namespace PinboardApp.Controllers
                 return HttpNotFound();
             }
             return View(note);
+        }
+
+        [HttpPost]
+        public ActionResult UpdatePosition(int? id)
+        {
+            Note noteToUpdate = db.Notes.Find(id);
+            if (noteToUpdate != null)
+            {
+                Stream req = Request.InputStream;
+                req.Seek(0, SeekOrigin.Begin);
+                string json = new StreamReader(req).ReadToEnd();
+                NotePositionViewModel model = JsonConvert.DeserializeObject<NotePositionViewModel>(json);
+
+                noteToUpdate.X = model.X;
+                noteToUpdate.Y = model.Y;
+                db.SaveChanges();
+            }
+            return RedirectToAction("Index");
         }
 
         // POST: Notes/Edit/5

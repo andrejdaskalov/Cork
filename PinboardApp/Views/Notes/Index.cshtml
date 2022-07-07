@@ -37,7 +37,7 @@
         
     <button class="btn" id="new-pinboard"><i class="bi bi-plus-circle"></i> New Pinboard</button>
     </div>
-    <div id="notes" style="background: #d2dadd; width: 80%; border-radius: 1rem 0 0 0" class="p-3">
+    <div id="notes" style="background: #d2dadd; width: 80%; border-radius: 1rem 0 0 0" class="p-3 position-relative">
         @if (Model is null)
         {
             <h3>No Pinboard selected</h3>
@@ -52,7 +52,7 @@
 
             foreach (var note in Model.Notes)
             {
-                <div class="card" style="width: 18rem;">
+                <div class="card position-absolute draggable-note" id="@note.ID" style="width: 18rem; left: @note.X ; top:@note.Y;">
                     <div class="card-body">
                         <h5 class="card-title">@note.Name</h5>
                         <p class="card-text">@note.Data</p>
@@ -71,12 +71,47 @@
 {
     <script>
         $(function() {
+            var loop = false;
             $('#new-note').click(function() {
-                window.location.href = '@Url.Action("Create", "Notes", new {id = Model.ID})';
+                window.location.href = '@Url.Action("Create", "Notes", new { id = Model.ID })';
             });
             $('#new-pinboard').click(function() {
                 window.location.href = '@Url.Action("Create", "Pinboards")'
             });
+//            $('.draggable-note').mousedown(function (e) {
+//                var parent = $('#notes')[0];
+//                var rect = parent.getBoundingClientRect();
+//
+//                this.style.left = (e.pageX - rect.left) + 'px';
+//                this.style.top = (e.pageY - rect.top) + 'px';
+//            });
+            $('.draggable-note').draggable({
+                containment: 'parent'
+            });
+            
+
+            $('.draggable-note').mouseup(function() {
+                var obj = {
+//                    "ID": this.id,
+                    "X": this.style.left,
+                    "Y": this.style.top
+                }
+                console.log(JSON.stringify(obj));
+                $.ajax({
+                    type: 'post',
+                    url: '/Notes/UpdatePosition/'+this.id,
+                    dataType:'json',
+                    contentType: "application/json; charset=utf-8",
+                    data: JSON.stringify(obj ),
+                    success: function(obj) {
+                        console.log("Successfully pushed position" + obj);
+                    },
+                    failure: function(obj) {
+                        console.log("Failed pushing position" + obj);
+                    }
+                })
+            })
+
         });
     </script>
 }
