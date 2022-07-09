@@ -30,3 +30,7 @@ textarea {
 .card-body:hover  .hidden-button, .nav-item:hover  .hidden-button {
     visibility: visible;
 }
+
+#notes {
+    height: 100%;
+}

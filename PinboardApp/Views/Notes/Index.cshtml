@@ -9,47 +9,62 @@
     ApplicationUser user = System.Web.HttpContext.Current.GetOwinContext().GetUserManager<ApplicationUserManager>().FindById(HttpContext.Current.User.Identity.GetUserId());
 }
 
-<div class="container-fluid d-flex flex-row" style="height: 100%">
-    <div style="width: 20%" class="d-flex flex-column justify-content-between">
-        @if (user.Pinboards is null || user.Pinboards.Count == 0)
-        {
-            <p>No pinboards. Start by creating one</p>
-        }
-        else
-        {
-            <ul class="nav nav-pills flex-column">
-                @foreach (var item in user.Pinboards)
+<div class="row h-100">
+    <div class="col-md-2">
+        <button class="btn" type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#navbarSupportedContent"
+                aria-controls="navbarSupportedContent"
+                aria-expanded="false"
+                aria-label="Toggle navigation">
+            <span>Pinboards <i class="bi bi-chevron-down"></i></span>
+        </button>
+        <div class="collapse" id="navbarSupportedContent">
+            <div class=" d-flex flex-column justify-content-between" >
+                @if (user.Pinboards is null || user.Pinboards.Count == 0)
                 {
-                    <li class="nav-item d-flex flex-row justify-content-between">
-                        @Ajax.ActionLink(item.Name, "Index", "Notes", new { id = item.ID }, new AjaxOptions
-                        {
-                            UpdateTargetId = "notes",
-                            InsertionMode = InsertionMode.Replace,
-                            HttpMethod = "GET"
-                        }, new { @class = "nav-link" })
-
-                        <a href="@Url.Action("Delete", "Pinboards", new { id = item.ID })" class="hidden-button py-2 px-5">
-                            <i class="bi bi-trash text-danger"></i>
-                        </a>
-                    </li>
+                    <p>No pinboards. Start by creating one</p>
                 }
-            </ul>
-        }
+                else
+                {
+                    <ul class="nav nav-pills d-flex flex-column " >
+                        @foreach (var item in user.Pinboards)
+                        {
+                            <li class="nav-item d-flex flex-row justify-content-between align-items-center">
+                                <div class="nav-link">
+                                    <i class="bi bi-clipboard-fill"></i>
+                                    @Ajax.ActionLink(item.Name, "Index", "Notes", new { id = item.ID }, new AjaxOptions
+                                    {
+                                        UpdateTargetId = "notes",
+                                        InsertionMode = InsertionMode.Replace,
+                                        HttpMethod = "GET"
+                                    }, new { @class = "nav-link d-inline-block ", style = "font-weight: bold; color: #2b4162" })
+                                </div>
 
-        <button class="btn" id="new-pinboard"><i class="bi bi-plus-circle"></i> New Pinboard</button>
+                                <a href="@Url.Action("Delete", "Pinboards", new { id = item.ID })" class="hidden-button mx-3">
+                                    <i class="bi bi-trash text-danger"></i>
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                }
+
+                <button class="btn" id="new-pinboard"><i class="bi bi-plus-circle"></i> New Pinboard</button>
+            </div>
+        </div>
     </div>
-    <div id="notes" style="background: #d2dadd; width: 80%; border-radius: 1rem 0 0 0" class="p-3 position-relative">
+    <div id="notes" style="background: #d2dadd;  border-radius: 1rem 0 0 0; overflow: scroll" class="p-3 position-relative col-md-10">
         @if (Model is null)
         {
             <h3>No Pinboard selected</h3>
         }
         else
         {
-            <h2 style="color:#506364">Notes in Pinboard @Model.Name </h2>
+            <h2 style="color: #506364">Notes in Pinboard @Model.Name </h2>
 
 
             @* @Html.ActionLink("Create New", "Create", new { id = Model.ID }) *@
-            <button class="btn position-fixed end-0 bottom-0 m-5 p-2" id="new-note" style="color: #FFF5F0; background: #a17c6b"><i class="bi bi-plus-circle"></i> New Note</button>
+            <button class="btn position-fixed end-0 bottom-0 m-5 p-2" id="new-note" style="color: #FFF5F0; background: #a17c6b; z-index: 100;"><i class="bi bi-plus-circle"></i> New Note</button>
 
             foreach (var note in Model.Notes)
             {
@@ -74,7 +89,7 @@
                             <p class="card-text">@note.Data</p>
                         }
                         <div class="d-flex flex-row justify-content-between">
-                            <button onclick="location.href = '@Url.Action("Edit","Notes",new {id = note.ID})'" class ="btn btn-outline-primary hidden-button">Edit Note</button>
+                            <button onclick="location.href = '@Url.Action("Edit", "Notes", new { id = note.ID })'" class="btn btn-outline-primary hidden-button">Edit Note</button>
                             <a href="@Url.Action("Delete", "Notes", new { id = note.ID })" class="hidden-button py-2">
                                 <i class="bi bi-trash text-danger"></i>
                             </a>

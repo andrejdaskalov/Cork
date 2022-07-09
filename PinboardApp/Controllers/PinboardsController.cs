@@ -58,7 +58,7 @@ namespace PinboardApp.Controllers
                 db.Pinboards.Add(pinboard);
                 user.Pinboards.Add(pinboard);
                 db.SaveChanges();
-                return RedirectToAction("Index");
+                return RedirectToAction("Index","Notes");
             }
 
             return View(pinboard);
@@ -90,7 +90,7 @@ namespace PinboardApp.Controllers
             {
                 db.Entry(pinboard).State = EntityState.Modified;
                 db.SaveChanges();
-                return RedirectToAction("Index");
+                return RedirectToAction("Index","Notes");
             }
             return View(pinboard);
         }
@@ -119,7 +119,7 @@ namespace PinboardApp.Controllers
             Pinboard pinboard = db.Pinboards.Find(id);
             db.Pinboards.Remove(pinboard);
             db.SaveChanges();
-            return RedirectToAction("Index");
+            return RedirectToAction("Index","Notes");
         }
 
         protected override void Dispose(bool disposing)

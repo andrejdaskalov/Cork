@@ -96,21 +96,6 @@ namespace PinboardApp.Controllers
             return View(model);
         }
 
-        // GET: Notes/Edit/5
-        public ActionResult Edit(int? id)
-        {
-            if (id == null)
-            {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
-            Note note = db.Notes.Find(id);
-            if (note == null)
-            {
-                return HttpNotFound();
-            }
-            return View(note);
-        }
-
         [HttpPost]
         public ActionResult UpdatePosition(int? id)
         {
@@ -129,12 +114,29 @@ namespace PinboardApp.Controllers
             return RedirectToAction("Index");
         }
 
+        // GET: Notes/Edit/5
+        public ActionResult Edit(int? id)
+        {
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+            Note note = db.Notes.Find(id);
+            if (note == null)
+            {
+                return HttpNotFound();
+            }
+            return View(note);
+        }
+
+        
+
         // POST: Notes/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to, for 
         // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind(Include = "ID,Name,Data,Type")] Note note)
+        public ActionResult Edit([Bind(Include = "ID,Name,Data,Type,X,Y")] Note note)
         {
             if (ModelState.IsValid)
             {
