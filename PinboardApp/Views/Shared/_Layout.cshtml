@@ -12,24 +12,13 @@
 
 
 </head>
-<body class="bg-light">
-<div class="navbar navbar-light bg-light navbar-expand-sm fixed-top py-3">
+<body class="bg-light overflow-hidden">
+<div class="navbar navbar-light bg-light navbar-expand-sm fixed-top py-3" style="flex-wrap: nowrap">
     <div class="container-fluid">
 
-        @* <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"> *@
-        @*     <span class="navbar-toggler-icon"></span> *@
-        @* </button> *@
-
-        @* <div class="collapse navbar-collapse" id="navbarSupportedContent" style="justify-content: space-between"> *@
-        @*     <a href="@Url.Action("Index","Notes")" class="d-none d-sm-inline-block"><img src="/Content/Images/logo.svg"  height="50px;"/></a> *@
-        @*     <form class="d-flex"> *@
-        @*         <input class="form-control" type="search" placeholder="Search" aria-label="Search"> *@
-        @*     </form> *@
-        @*     @Html.Partial("_LoginPartial") *@
-        @* </div> *@
         <a href="@Url.Action("Index","Notes")" class="d-none d-sm-inline-block"><img src="/Content/Images/logo.svg"  height="50px;"/></a>
         <form class="d-flex">
-            <input class="form-control" type="search" placeholder="Search" aria-label="Search">
+            <input class="form-control mx-1" type="search" placeholder="Search" aria-label="Search">
         </form>
         @Html.Partial("_LoginPartial")
     </div>

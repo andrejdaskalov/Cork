@@ -5,110 +5,117 @@
 @model PinboardApp.Models.Pinboard
 
 @{
-    ViewBag.Title = "Index";
+    ViewBag.Title = "Notes";
     ApplicationUser user = System.Web.HttpContext.Current.GetOwinContext().GetUserManager<ApplicationUserManager>().FindById(HttpContext.Current.User.Identity.GetUserId());
 }
+@if (Model != null)
+{
+    <div class="row h-100">
+        <div class="col-md-2">
+            <button class="btn" type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#navbarSupportedContent"
+                    aria-controls="navbarSupportedContent"
+                    aria-expanded="false"
+                    aria-label="Toggle navigation">
+                <span>Pinboards <i class="bi bi-chevron-down"></i></span>
+            </button>
+            <div class="collapse" id="navbarSupportedContent">
+                <div class=" d-flex flex-column justify-content-between">
+                    @if (user.Pinboards is null || user.Pinboards.Count == 0)
+                    {
+                        <p>No pinboards. Start by creating one</p>
+                    }
+                    else
+                    {
+                        <ul class="nav nav-pills d-flex flex-column ">
+                            @foreach (var item in user.Pinboards)
+                            {
+                                <li class="nav-item d-flex flex-row justify-content-between align-items-center">
+                                    <div class="nav-link">
+                                        <i class="bi bi-clipboard-fill"></i>
+                                        @Ajax.ActionLink(item.Name, "Index", "Notes", new { id = item.ID }, new AjaxOptions
+                                        {
+                                            UpdateTargetId = "notes",
+                                            InsertionMode = InsertionMode.Replace,
+                                            HttpMethod = "GET"
+                                        }, new { @class = "nav-link d-inline-block ", style = "font-weight: bold; color: #2b4162" })
+                                    </div>
+                                    
+                                    <div class="d-flex flex-row justify-content-start">
+                                        <a href="@Url.Action("Edit", "Pinboards", new { id = item.ID })" class="hidden-button mx-3">
+                                            <i class="bi bi-pen text-primary"></i>
+                                        </a>
+                                        <a href="@Url.Action("Delete", "Pinboards", new { id = item.ID })" class="hidden-button mx-3">
+                                            <i class="bi bi-trash text-danger"></i>
+                                        </a>
+                                    </div>
+                                </li>
+                            }
+                        </ul>
+                    }
 
-<div class="row h-100">
-    <div class="col-md-2">
-        <button class="btn" type="button"
-                data-bs-toggle="collapse"
-                data-bs-target="#navbarSupportedContent"
-                aria-controls="navbarSupportedContent"
-                aria-expanded="false"
-                aria-label="Toggle navigation">
-            <span>Pinboards <i class="bi bi-chevron-down"></i></span>
-        </button>
-        <div class="collapse" id="navbarSupportedContent">
-            <div class=" d-flex flex-column justify-content-between" >
-                @if (user.Pinboards is null || user.Pinboards.Count == 0)
-                {
-                    <p>No pinboards. Start by creating one</p>
-                }
-                else
-                {
-                    <ul class="nav nav-pills d-flex flex-column " >
-                        @foreach (var item in user.Pinboards)
-                        {
-                            <li class="nav-item d-flex flex-row justify-content-between align-items-center">
-                                <div class="nav-link">
-                                    <i class="bi bi-clipboard-fill"></i>
-                                    @Ajax.ActionLink(item.Name, "Index", "Notes", new { id = item.ID }, new AjaxOptions
-                                    {
-                                        UpdateTargetId = "notes",
-                                        InsertionMode = InsertionMode.Replace,
-                                        HttpMethod = "GET"
-                                    }, new { @class = "nav-link d-inline-block ", style = "font-weight: bold; color: #2b4162" })
-                                </div>
-
-                                <a href="@Url.Action("Delete", "Pinboards", new { id = item.ID })" class="hidden-button mx-3">
-                                    <i class="bi bi-trash text-danger"></i>
-                                </a>
-                            </li>
-                        }
-                    </ul>
-                }
-
-                <button class="btn" id="new-pinboard"><i class="bi bi-plus-circle"></i> New Pinboard</button>
+                    <button class="btn" id="new-pinboard"><i class="bi bi-plus-circle"></i> New Pinboard</button>
+                </div>
             </div>
         </div>
-    </div>
-    <div id="notes" style="background: #d2dadd;  border-radius: 1rem 0 0 0; overflow: scroll" class="p-3 position-relative col-md-10">
-        @if (Model is null)
-        {
-            <h3>No Pinboard selected</h3>
-        }
-        else
-        {
-            <h2 style="color: #506364">Notes in Pinboard @Model.Name </h2>
+        <div id="notes" style="background: #d2dadd; border-radius: 1rem 0 0 0; overflow: auto" class="p-3 position-relative col-md-10">
+            @if (Model is null)
+            {
+                <h3>No Pinboard selected</h3>
+            }
+            else
+            {
+                <h2 style="color: #506364">Notes in Pinboard @Model.Name </h2>
 
 
             @* @Html.ActionLink("Create New", "Create", new { id = Model.ID }) *@
-            <button class="btn position-fixed end-0 bottom-0 m-5 p-2" id="new-note" style="color: #FFF5F0; background: #a17c6b; z-index: 100;"><i class="bi bi-plus-circle"></i> New Note</button>
+                <button class="btn position-fixed end-0 bottom-0 m-5 p-2" id="new-note" style="color: #FFF5F0; background: #a17c6b; z-index: 100;"><i class="bi bi-plus-circle"></i> New Note</button>
 
-            foreach (var note in Model.Notes)
-            {
-                <div class="card position-absolute draggable-note" id="@note.ID" style="width: 18rem; left: @note.X; top: @note.Y;">
-                    @if (note.Type == Type.Image)
-                    {
-                        <img src="@note.Data" class="card-img-top" alt="@note.Name + 'image'">
-                    }
-                    else if (note.Type == Type.Link)
-                    {
-                        <a href="@note.Data">
-                            <svg class="card-img-top" xmlns="http://www.w3.org/2000/svg" height="80" fill="currentColor" class="bi bi-link" viewBox="0 0 16 16">
-                                <path d="M6.354 5.5H4a3 3 0 0 0 0 6h3a3 3 0 0 0 2.83-4H9c-.086 0-.17.01-.25.031A2 2 0 0 1 7 10.5H4a2 2 0 1 1 0-4h1.535c.218-.376.495-.714.82-1z"/>
-                                <path d="M9 5.5a3 3 0 0 0-2.83 4h1.098A2 2 0 0 1 9 6.5h3a2 2 0 1 1 0 4h-1.535a4.02 4.02 0 0 1-.82 1H12a3 3 0 1 0 0-6H9z"/>
-                            </svg>
-                        </a>
-                    }
-                    <div class="card-body">
-                        <h5 class="card-title">@note.Name</h5>
-                        @if (note.Type == Type.Text)
+                foreach (var note in Model.Notes)
+                {
+                    <div class="card position-absolute overflow-scroll draggable-note" id="@note.ID" style="width: 18rem; max-height: 20rem; left: @note.X; top: @note.Y;">
+                        @if (note.Type == Type.Image)
                         {
-                            <p class="card-text">@note.Data</p>
+                            <img src="@note.Data" class="card-img-top" alt="@note.Name + 'image'">
                         }
-                        <div class="d-flex flex-row justify-content-between">
-                            <button onclick="location.href = '@Url.Action("Edit", "Notes", new { id = note.ID })'" class="btn btn-outline-primary hidden-button">Edit Note</button>
-                            <a href="@Url.Action("Delete", "Notes", new { id = note.ID })" class="hidden-button py-2">
-                                <i class="bi bi-trash text-danger"></i>
+                        else if (note.Type == Type.Link)
+                        {
+                            <a href="@note.Data">
+                                <svg class="card-img-top" xmlns="http://www.w3.org/2000/svg" height="80" fill="currentColor" class="bi bi-link" viewBox="0 0 16 16">
+                                    <path d="M6.354 5.5H4a3 3 0 0 0 0 6h3a3 3 0 0 0 2.83-4H9c-.086 0-.17.01-.25.031A2 2 0 0 1 7 10.5H4a2 2 0 1 1 0-4h1.535c.218-.376.495-.714.82-1z"/>
+                                    <path d="M9 5.5a3 3 0 0 0-2.83 4h1.098A2 2 0 0 1 9 6.5h3a2 2 0 1 1 0 4h-1.535a4.02 4.02 0 0 1-.82 1H12a3 3 0 1 0 0-6H9z"/>
+                                </svg>
                             </a>
+                        }
+                        <div class="card-body">
+                            <h5 class="card-title">@note.Name</h5>
+                            @if (note.Type == Type.Text)
+                            {
+                                <p class="card-text">@note.Data</p>
+                            }
+                            <div class="d-flex flex-row justify-content-between">
+                                <button onclick="location.href = '@Url.Action("Edit", "Notes", new { id = note.ID })'" class="btn btn-outline-primary hidden-button">Edit Note</button>
+                                <a href="@Url.Action("Delete", "Notes", new { id = note.ID })" class="hidden-button py-2">
+                                    <i class="bi bi-trash text-danger"></i>
+                                </a>
+                            </div>
                         </div>
                     </div>
-                </div>
+                }
             }
-        }
+
+        </div>
 
     </div>
-
-</div>
 
 @section scripts
 {
     <script>
         $(function() {
+
             $('#new-note').click(function() {
-                window.location.href = '@Url.Action("Create", "Notes", new { id = Model.ID })';
+                window.location.href = '@Url.Action("Create", "Notes", new { id = Model?.ID })';
             });
             $('#new-pinboard').click(function() {
                 window.location.href = '@Url.Action("Create", "Pinboards")';
@@ -117,6 +124,7 @@
             $('.draggable-note').draggable({
                 containment: 'parent'
             });
+            $('.draggable-note').resizable();
 
             $('.draggable-note').mouseup(function() {
                 var obj = {
@@ -140,4 +148,19 @@
             });
         });
     </script>
+}}
+else
+{
+    <div class="row h-100">
+        <div class="col-md-2"></div>
+        <div class="col-md-6 p-3 p-md-0">
+            <h1>You have no Pinboards.</h1> 
+            <h2>Start by creating one</h2>
+            <a class="btn btn-primary d-inline-block" href="@Url.Action("Create", "Pinboards")">Create</a>
+        </div>
+        <div class="col-md-2">
+            <img class="w-100 p-3 p-md-0" src="~/Content/Images/undraw_no_data_re_kwbl.svg"/>
+        </div>
+        <div class="col-md-2"></div>
+    </div>
 }

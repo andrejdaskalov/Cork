@@ -37,33 +37,27 @@ namespace PinboardApp.Controllers
             return View(pinboard);
         }
 
-        // GET: Notes/Details/5
-        public ActionResult Details(int? id)
-        {
-            if (id == null)
-            {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
-            Note note = db.Notes.Find(id);
-            if (note == null)
-            {
-                return HttpNotFound();
-            }
-            return View(note);
-        }
+        // // GET: Notes/Details/5
+        // public ActionResult Details(int? id)
+        // {
+        //     if (id == null)
+        //     {
+        //         return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+        //     }
+        //     Note note = db.Notes.Find(id);
+        //     if (note == null)
+        //     {
+        //         return HttpNotFound();
+        //     }
+        //     return View(note);
+        // }
 
         // GET: Notes/Create
         public ActionResult Create(int? id)
         {
             if(id == null)
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            //var user = db.Users.Find(User.Identity.GetUserId());
-            //var pinboard = user.Pinboards.FirstOrDefault(p => p.ID == id);
             CreateViewModel model = new CreateViewModel {Note = new Note(), PinboardId = id};
-            // if (pinboard is null)
-            // {
-            //     return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            // }
             return View(model);
         }
 
@@ -100,6 +94,11 @@ namespace PinboardApp.Controllers
         public ActionResult UpdatePosition(int? id)
         {
             Note noteToUpdate = db.Notes.Find(id);
+            var user = db.Users.Find(User.Identity.GetUserId());
+            if (!user.Pinboards.Contains(noteToUpdate.Pinboard))
+            {
+                return new HttpUnauthorizedResult("You are not authorized to modify this Note.");
+            }
             if (noteToUpdate != null)
             {
                 Stream req = Request.InputStream;
@@ -125,6 +124,11 @@ namespace PinboardApp.Controllers
             if (note == null)
             {
                 return HttpNotFound();
+            }
+            var user = db.Users.Find(User.Identity.GetUserId());
+            if (!user.Pinboards.Contains(note.Pinboard))
+            {
+                return new HttpUnauthorizedResult("You are not authorized to modify this Note.");
             }
             return View(note);
         }
@@ -158,6 +162,11 @@ namespace PinboardApp.Controllers
             if (note == null)
             {
                 return HttpNotFound();
+            }
+            var user = db.Users.Find(User.Identity.GetUserId());
+            if (!user.Pinboards.Contains(note.Pinboard))
+            {
+                return new HttpUnauthorizedResult("You are not authorized to modify this Note.");
             }
             return View(note);
         }

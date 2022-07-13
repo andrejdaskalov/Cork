@@ -17,26 +17,26 @@ namespace PinboardApp.Controllers
     {
         private ApplicationDbContext db = new ApplicationDbContext();
 
-        // GET: Pinboards
-        public ActionResult Index()
-        {
-            return View(db.Pinboards.ToList());
-        }
+        // // GET: Pinboards
+        // public ActionResult Index()
+        // {
+        //     return View(db.Pinboards.ToList());
+        // }
 
-        // GET: Pinboards/Details/5
-        public ActionResult Details(int? id)
-        {
-            if (id == null)
-            {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
-            Pinboard pinboard = db.Pinboards.Find(id);
-            if (pinboard == null)
-            {
-                return HttpNotFound();
-            }
-            return View(pinboard);
-        }
+        // // GET: Pinboards/Details/5
+        // public ActionResult Details(int? id)
+        // {
+        //     if (id == null)
+        //     {
+        //         return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+        //     }
+        //     Pinboard pinboard = db.Pinboards.Find(id);
+        //     if (pinboard == null)
+        //     {
+        //         return HttpNotFound();
+        //     }
+        //     return View(pinboard);
+        // }
 
         // GET: Pinboards/Create
         public ActionResult Create()
@@ -71,10 +71,15 @@ namespace PinboardApp.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
+            var user = db.Users.Find(User.Identity.GetUserId());
             Pinboard pinboard = db.Pinboards.Find(id);
             if (pinboard == null)
             {
                 return HttpNotFound();
+            }
+            if (!user.Pinboards.Contains(pinboard))
+            {
+                return new HttpUnauthorizedResult("You are not authorized to modify this Pinboard.");
             }
             return View(pinboard);
         }
@@ -102,11 +107,16 @@ namespace PinboardApp.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
+            var user = db.Users.Find(User.Identity.GetUserId());
             Pinboard pinboard = db.Pinboards.Find(id);
-
             if (pinboard == null)
             {
                 return HttpNotFound();
+            }
+
+            if (!user.Pinboards.Contains(pinboard))
+            {
+                return new HttpUnauthorizedResult("You are not authorized to modify this Pinboard.");
             }
             return View(pinboard);
         }
@@ -117,6 +127,7 @@ namespace PinboardApp.Controllers
         public ActionResult DeleteConfirmed(int id)
         {
             Pinboard pinboard = db.Pinboards.Find(id);
+            db.Notes.RemoveRange(pinboard.Notes);
             db.Pinboards.Remove(pinboard);
             db.SaveChanges();
             return RedirectToAction("Index","Notes");
