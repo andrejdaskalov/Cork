@@ -10,7 +10,7 @@ namespace PinboardApp.Controllers
     {
         public ActionResult Index()
         {
-            return View();
+            return RedirectToAction("Index","Notes");
         }
 
         public ActionResult About()

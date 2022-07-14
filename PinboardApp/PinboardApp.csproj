@@ -204,6 +204,7 @@
     <Compile Include="Models\NotePositionViewModel.cs" />
     <Compile Include="Models\NotesViewModels.cs" />
     <Compile Include="Models\Pinboard.cs" />
+    <Compile Include="Models\SearchViewModel.cs" />
     <Compile Include="Models\Type.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
@@ -227,6 +228,7 @@
     <Content Include="Content\bootstrap.rtl.min.css" />
     <Content Include="Content\Images\logo.svg" />
     <Content Include="Content\Images\undraw_no_data_re_kwbl.svg" />
+    <Content Include="Content\Images\undraw_void_-3-ggu.svg" />
     <Content Include="Content\themes\base\accordion.css" />
     <Content Include="Content\themes\base\all.css" />
     <Content Include="Content\themes\base\autocomplete.css" />
@@ -357,6 +359,7 @@
     <Content Include="Views\Notes\Details.cshtml" />
     <Content Include="Views\Notes\Edit.cshtml" />
     <Content Include="Views\Notes\Index.cshtml" />
+    <Content Include="Views\Notes\Search.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

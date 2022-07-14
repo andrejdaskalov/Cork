@@ -37,6 +37,55 @@ namespace PinboardApp.Controllers
             return View(pinboard);
         }
 
+        public ActionResult Search(string query, int? id)
+        {
+            var user = db.Users.Find(User.Identity.GetUserId());
+            List<Pinboard> pinboards = user.Pinboards.ToList();
+            List<Pinboard> results = new List<Pinboard>();
+            SearchViewModel model = new SearchViewModel();
+            foreach (var pinboard in pinboards)
+            {
+                // pinboard.Name = pinboard.Name.Replace(query, "<mark>" + query + "</mark>");
+                var newpinboard = new Pinboard();
+                bool matches = pinboard.Name.Contains(query);
+
+                newpinboard.Name = pinboard.Name;
+                newpinboard.ID = pinboard.ID;
+                newpinboard.Notes = new List<Note>();
+                foreach (var note in pinboard.Notes)
+                {
+                    if (note.Name.Contains(query) || note.Data.Contains(query))
+                    {
+                        matches = true;
+                        newpinboard.Notes.Add(note);
+                        // note.Name = note.Name.Replace(query, "<mark>" + query + "</mark>");
+                        // note.Data = note.Data.Replace(query, "<mark>" + query + "</mark>");
+                    }
+                }
+
+                if (matches)
+                {
+                    results.Add(newpinboard);
+                }
+            }
+            model.List = results;
+            if (id == null )
+            {
+                model.CurrentPinboard = results.FirstOrDefault();
+            }
+            else
+            {
+                model.CurrentPinboard = results.First(board => board.ID == id);
+
+            }
+            model.query=query;
+
+
+            return View(model);
+        }
+
+    
+
         // // GET: Notes/Details/5
         // public ActionResult Details(int? id)
         // {

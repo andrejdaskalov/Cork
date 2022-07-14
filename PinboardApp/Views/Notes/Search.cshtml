@@ -1,0 +1,123 @@
+﻿@model PinboardApp.Models.SearchViewModel
+
+@{
+    ViewBag.Title = "Search";
+}
+<button class="btn position-fixed end-0 bottom-0 m-5 p-2" onclick="location.href='@Url.Action("Index","Notes")'" style="color: #FFF5F0; background: #a17c6b; z-index: 100;"><i class="bi bi-arrow-90deg-left"></i> Back To Notes</button>
+@if (Model.List != null && Model.List.ToList().Count != 0)
+{
+    <div class="row h-100">
+        <div class="col-md-2">
+            <button class="btn" type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#navbarSupportedContent"
+                    aria-controls="navbarSupportedContent"
+                    aria-expanded="false"
+                    aria-label="Toggle navigation">
+                <span>Pinboards <i class="bi bi-chevron-down"></i></span>
+            </button>
+            <div class="collapse" id="navbarSupportedContent">
+                <div class=" d-flex flex-column justify-content-between">
+
+
+                    <ul class="nav nav-pills d-flex flex-column ">
+                        @foreach (var item in Model.List)
+                        {
+                            
+                                @* @item.Name.Replace(Model.query, "<mark>" + Model.query + "</mark>"); *@
+                            <li class="nav-item d-flex flex-row justify-content-between align-items-center">
+                                <div class="nav-link">
+                                    <i class="bi bi-clipboard-fill"></i>
+                                    @Ajax.ActionLink(item.Name, "Search", "Notes", new { query = Model.query, id = item.ID }, new AjaxOptions
+                                    {
+                                        UpdateTargetId = "notes",
+                                        InsertionMode = InsertionMode.Replace,
+                                        HttpMethod = "GET"
+                                    }, new { @class = "nav-link d-inline-block ", style = "font-weight: bold; color: #2b4162" })
+                                </div>
+
+                                <div class="d-flex flex-row justify-content-start">
+                                    <a href="@Url.Action("Edit", "Pinboards", new { id = item.ID })" class="hidden-button mx-3">
+                                        <i class="bi bi-pen text-primary"></i>
+                                    </a>
+                                    <a href="@Url.Action("Delete", "Pinboards", new { id = item.ID })" class="hidden-button mx-3">
+                                        <i class="bi bi-trash text-danger"></i>
+                                    </a>
+                                </div>
+                            </li>
+                        }
+                    </ul>
+
+                </div>
+            </div>
+        </div>
+        
+        <div id="notes" style="background: #d2dadd; border-radius: 1rem 0 0 0; overflow: auto" class="p-3 col-md-10 d-flex flex-row flex-wrap justify-content-start">
+            @if (Model.CurrentPinboard is null)
+            {
+                <h3>No Pinboard selected</h3>
+            }
+            else
+            {
+
+                foreach (var note in Model.CurrentPinboard.Notes)
+                {
+                    @* @note.Name.Replace(Model.query, "<mark>" + Model.query + "</mark>"); *@
+                    @* @note.Data.Replace(Model.query, "<mark>" + Model.query + "</mark>"); *@
+                    <div class="card overflow-scroll m-3" id="@note.ID" style="width: 18rem; max-height: 20rem;">
+                        @if (note.Type == PinboardApp.Models.Type.Image)
+                        {
+                            <img src="@note.Data" class="card-img-top" alt="@note.Name + 'image'">
+                        }
+                        else if (note.Type == PinboardApp.Models.Type.Link)
+                        {
+                            <a href="@note.Data">
+                                <svg class="card-img-top" xmlns="http://www.w3.org/2000/svg" height="80" fill="currentColor" class="bi bi-link" viewBox="0 0 16 16">
+                                    <path d="M6.354 5.5H4a3 3 0 0 0 0 6h3a3 3 0 0 0 2.83-4H9c-.086 0-.17.01-.25.031A2 2 0 0 1 7 10.5H4a2 2 0 1 1 0-4h1.535c.218-.376.495-.714.82-1z"/>
+                                    <path d="M9 5.5a3 3 0 0 0-2.83 4h1.098A2 2 0 0 1 9 6.5h3a2 2 0 1 1 0 4h-1.535a4.02 4.02 0 0 1-.82 1H12a3 3 0 1 0 0-6H9z"/>
+                                </svg>
+                            </a>
+                        }
+                        <div class="card-body">
+                            <h5 class="card-title">@note.Name</h5>
+                            @if (note.Type == PinboardApp.Models.Type.Text)
+                            {
+                                <p class="card-text">@note.Data</p>
+                            }
+                            <div class="d-flex flex-row justify-content-between">
+                                <button onclick="location.href = '@Url.Action("Edit", "Notes", new { id = note.ID })'" class="btn btn-outline-primary hidden-button">Edit Note</button>
+                                <a href="@Url.Action("Delete", "Notes", new { id = note.ID })" class="hidden-button py-2">
+                                    <i class="bi bi-trash text-danger"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+
+        </div>
+
+    </div>
+
+@section scripts
+{
+    <script>
+        $('#notes')[0].innerHTML=$('#notes')[0].innerHTML.replaceAll(/(@Model.query)/ig,"<mark>$1</mark>")
+        $('#navbarSupportedContent')[0].innerHTML = $('#navbarSupportedContent')[0].innerHTML.replaceAll(/(@Model.query)/ig,"<mark>$1</mark>")
+    </script>
+}}
+else
+{
+    <div class="row h-100">
+        <div class="col-md-2"></div>
+        <div class="col-md-6 p-3 p-md-0">
+            <h1 class="mb-3">No search results found matching your query.</h1>
+            <a class="btn btn-primary d-inline-block" href="@Url.Action("Index", "Notes")">Back To Notes</a>
+        </div>
+        <div class="col-md-2">
+            <img class="w-100 p-3 p-md-0" src="~/Content/Images/undraw_void_-3-ggu.svg" />
+        </div>
+        <div class="col-md-2"></div>
+    </div>
+}
+
